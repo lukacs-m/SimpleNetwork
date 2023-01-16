@@ -12,12 +12,13 @@ public protocol SimpleClientImplementing: AnyObject, Sendable {
     var session: URLSession { get }
     var decoder: JSONDecoder { get }
     
-    func request<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType
+    func request<ReturnedType: Decodable>(endpoint: Endpoint) async throws -> ReturnedType
     func request<ReturnedType: Decodable>(endpoint: Endpoint) -> AnyPublisher<ReturnedType, Error>
+    func requestNonDecadable<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType
 }
 
 public extension SimpleClientImplementing {
-    func request<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType where ReturnedType: Decodable {
+    func request<ReturnedType: Decodable>(endpoint: Endpoint) async throws -> ReturnedType {
         guard let request = endpoint.request else {
             throw RequestError.invalidURL
         }
@@ -59,7 +60,7 @@ public extension SimpleClientImplementing {
         }.eraseToAnyPublisher()
     }
     
-    func request<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType {
+    func requestNonDecadable<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType {
         guard let request = endpoint.request else {
             throw RequestError.invalidURL
         }
