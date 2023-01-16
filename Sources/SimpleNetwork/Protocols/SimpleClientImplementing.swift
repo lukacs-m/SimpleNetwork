@@ -12,7 +12,7 @@ public protocol SimpleClientImplementing: AnyObject, Sendable {
     var session: URLSession { get }
     var decoder: JSONDecoder { get }
     
-    func request<ReturnedType: Decodable>(endpoint: Endpoint) async throws -> ReturnedType
+    func request<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType
     func request<ReturnedType: Decodable>(endpoint: Endpoint) -> AnyPublisher<ReturnedType, Error>
 }
 
@@ -57,5 +57,34 @@ public extension SimpleClientImplementing {
                 }
             }
         }.eraseToAnyPublisher()
+    }
+    
+    func request<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType {
+        guard let request = endpoint.request else {
+            throw RequestError.invalidURL
+        }
+        do {
+            let (data, response) = try await session.data(for: request, delegate: nil)
+            guard let response = response as? HTTPURLResponse else {
+                throw RequestError.noResponse
+            }
+            switch response.statusCode {
+            case 200...299:
+                if ReturnedType.self is Void.Type {
+                    return Void() as! ReturnedType
+                } else if ReturnedType.self is Data.Type {
+                    return data as! ReturnedType
+                }
+                guard let returnObject = try JSONSerialization.jsonObject(with: data, options: []) as? ReturnedType else {
+                    throw RequestError.mismatchErrorInReturnType
+                }
+                
+                return returnObject
+            default:
+                throw HTTPErrors.error(for: response.statusCode)
+            }
+        } catch {
+            throw error
+        }
     }
 }
