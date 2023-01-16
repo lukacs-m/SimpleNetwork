@@ -17,7 +17,7 @@ public protocol SimpleClientImplementing: AnyObject, Sendable {
 }
 
 public extension SimpleClientImplementing {
-    func request<ReturnedType: Decodable>(endpoint: Endpoint) async throws -> ReturnedType {
+    func request<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType where ReturnedType: Decodable {
         guard let request = endpoint.request else {
             throw RequestError.invalidURL
         }
