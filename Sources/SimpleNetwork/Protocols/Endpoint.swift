@@ -21,6 +21,10 @@ public extension Endpoint {
     var scheme: String {
         "https"
     }
+    
+    var baseUrl: String? {
+        nil
+    }
 
     var request: URLRequest? {
         guard let url = endpointUrl else {
