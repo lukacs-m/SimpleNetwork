@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SimpleNetwork",
     platforms: [
-        .iOS(.v16),
+        .iOS(.v15),
         .tvOS(.v16),
         .watchOS(.v8),
         .macOS(.v13)
