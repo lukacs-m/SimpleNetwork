@@ -11,6 +11,7 @@ public protocol Endpoint {
     var scheme: String { get }
     var host: String { get }
     var path: String { get }
+    var baseUrl: String? { get }
     var method: CRUDRequestMethod { get }
     var header: [String: String]? { get }
     var body: [String: String]? { get }
@@ -22,12 +23,7 @@ public extension Endpoint {
     }
 
     var request: URLRequest? {
-        var urlComponents = URLComponents()
-        urlComponents.scheme = scheme
-        urlComponents.host = host
-        urlComponents.path = path
-
-        guard let url = urlComponents.url else {
+        guard let url = endpointUrl else {
             return nil
         }
 
@@ -40,6 +36,17 @@ public extension Endpoint {
             request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         }
         return request
+    }
+    
+    private var endpointUrl: URL? {
+        if let baseUrl = baseUrl {
+            return URL(string: "\(baseUrl)\(path)")
+        }
+        var urlComponents = URLComponents()
+        urlComponents.scheme = scheme
+        urlComponents.host = host
+        urlComponents.path = path
+        return urlComponents.url
     }
 }
 
