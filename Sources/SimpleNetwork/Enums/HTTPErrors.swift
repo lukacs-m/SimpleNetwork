@@ -7,7 +7,11 @@
 
 import Foundation
 
-enum HTTPErrors: Error {
+/**
+ The `HTTPErrors` enumeration is a Swift enumeration that conforms to the Error protocol.
+ It is used to represent HTTP errors that can occur when making network calls.
+ */
+public enum HTTPErrors: Error {
     case badRequest
     case unauthorized
     case forbidden
@@ -18,7 +22,7 @@ enum HTTPErrors: Error {
     case gatewayTimeout
     case unknown
 
-    var message: String {
+    public var message: String {
         switch self {
         case .badRequest:
             return "Bad request."
@@ -41,7 +45,7 @@ enum HTTPErrors: Error {
         }
     }
 
-    static func error(for statusCode: Int) -> HTTPErrors {
+    public static func error(for statusCode: Int) -> HTTPErrors {
         switch statusCode {
         case 400:
             return .badRequest

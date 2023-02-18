@@ -1,11 +1,15 @@
 //
-//  RequestError.swift
+//  RequestErrors.swift
 //  
 //
 //  Created by Martin Lukacs on 15/01/2023.
 //
 
-enum RequestError: Error {
+/**
+ The `RequestErrors` enumeration is a Swift enumeration that conforms to the Error protocol.
+ It is used to represent errors that can occur when making network requests.
+ */
+public enum RequestErrors: Error {
     case decode
     case invalidURL
     case noResponse
@@ -14,7 +18,7 @@ enum RequestError: Error {
     case unknown
     case mismatchErrorInReturnType
 
-    var customMessage: String {
+    public var customMessage: String {
         switch self {
         case .decode:
             return "Decode error"

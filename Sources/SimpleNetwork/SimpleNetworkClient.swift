@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class SimpleNetworkClient: Sendable, SimpleClientImplementing {
+public final class SimpleNetworkClient: SimpleClient {
     public let session: URLSession
     public let decoder: JSONDecoder
 
