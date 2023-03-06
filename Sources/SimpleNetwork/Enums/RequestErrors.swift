@@ -1,6 +1,6 @@
 //
 //  RequestErrors.swift
-//  
+//
 //
 //  Created by Martin Lukacs on 15/01/2023.
 //

@@ -1,92 +1,7 @@
 import XCTest
 import Combine
+import Foundation
 @testable import SimpleNetwork
-
-enum TestEndpoint {
-    case getPosts
-    case createPost
-    case updatePost
-    case patchPost
-    case deletePost
-}
-
-extension TestEndpoint: Endpoint {
-    var baseUrl: String? {
-        "https://jsonplaceholder.typicode.com"
-    }
-    
-    var path: String {
-        switch self {
-        case .getPosts, .createPost:
-            return "/posts"
-        case .updatePost, .patchPost, .deletePost:
-            return "/posts/1"
-        }
-    }
-    
-    var method: CRUDRequestMethod {
-        switch self {
-        case .getPosts:
-            return .get
-        case .createPost:
-            return .post
-        case .updatePost:
-            return .put
-        case .patchPost:
-            return .patch
-        case .deletePost:
-            return .delete
-        }
-    }
-    
-    var header: [String: String]? {
-        switch self {
-        default:
-            return [
-                "Content-type": "application/json; charset=UTF-8"
-            ]
-        }
-    }
-    
-    var body: [String: Any]? {
-        switch self {
-        case .createPost:
-            return [
-                "title": "Title test",
-                "body": "this is the body test",
-                "userId": 42,
-            ]
-        case .updatePost:
-            return [
-                "id": "1",
-                "title": "Title is test updated",
-                "body": "this is the body test updated",
-                "userId": 45,
-            ]
-        case .patchPost:
-            return [
-                "title": "Title test new",
-            ]
-        default:
-            return nil
-        }
-    }
-}
-
-// MARK: - Post
-struct Post: Codable {
-    let id: Int
-    let title, body: String
-    let userID: Int
-
-    enum CodingKeys: String, CodingKey {
-        case id, title, body
-        case userID = "userId"
-    }
-}
-
-typealias Posts = [Post]
-
 
 final class SimpleNetworkTests: XCTestCase {
     let sut = SimpleNetworkClient()
@@ -123,9 +38,24 @@ final class SimpleNetworkTests: XCTestCase {
     }
     
     func testDeletePostAsync() async throws {
-        let _: Void = try await sut.requestNonDecadable(endpoint: TestEndpoint.deletePost)
+        let _: Void = try await sut.requestNonDecodable(endpoint: TestEndpoint.deletePost)
     }
     
+    func test_multipartDataAsync_withImage_shouldBeValid() async throws {
+        guard let url = Bundle.module.url(forResource: "tests", withExtension: "png"),
+              let data = try? Data(contentsOf: url, options: .mappedIfSafe) else {
+            XCTFail("Should not return a error")
+            return
+        }
+
+        let mimetype = url.mimeType
+        let parts = MultiPartFormData(data: data, name: "testFile", mimeType: mimetype, fileName: "tests.png")
+
+        let image: MultipartTestResponse = try await sut.request(endpoint: ComplexeEndpoint.multipart(data: [parts]))
+        XCTAssertNotNil(image)
+        XCTAssertTrue(image.files.testFile.contains("png"))
+    }
+ 
     // MARK: - Publishers
     
     func testGetPostsPublisher() {
@@ -207,7 +137,7 @@ final class SimpleNetworkTests: XCTestCase {
     func testDeletePostPublisher()  {
         let expectation = XCTestExpectation(description: "wait for completion")
 
-        cancellable = sut.requestNonDecadable(endpoint: TestEndpoint.deletePost)
+        cancellable = sut.requestNonDecodable(endpoint: TestEndpoint.deletePost)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
@@ -221,10 +151,10 @@ final class SimpleNetworkTests: XCTestCase {
         XCTWaiter().wait(for: [expectation], timeout: 5)
     }
     
-    func testDeletePostFailurePublisher() {
+    func test_deletePostPublisher_withMismatchReturnTypes_shouldFail() {
         let expectation = XCTestExpectation(description: "wait for completion")
 
-        cancellable = sut.requestNonDecadable(endpoint: TestEndpoint.deletePost)
+        cancellable = sut.requestNonDecodable(endpoint: TestEndpoint.deletePost)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 switch completion {
