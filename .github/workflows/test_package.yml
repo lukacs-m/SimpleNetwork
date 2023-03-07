@@ -3,13 +3,11 @@ name: Swift test Package
 on: [push]
 
 jobs:
-  build:
-
+  tests:
     runs-on: macos-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: swift build
-      - name: Run tests
-        run: swift test
+    - uses: actions/checkout@v3
+    - name: Build for macOS
+      run: swift build -v
+    - name: Run macOS tests
+      run: swift test -v
