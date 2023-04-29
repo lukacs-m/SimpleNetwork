@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct MultiPartFormData {
+public struct MultiPartFormData: Sendable {
     public let data: Data
     public let name: String
     public let mimeType: String

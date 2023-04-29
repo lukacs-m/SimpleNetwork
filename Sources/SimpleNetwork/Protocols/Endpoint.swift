@@ -8,13 +8,13 @@
 import Foundation
 
 /// The `Endpoint` protocol defines the properties and methods required to create an HTTP endpoint.
-public protocol Endpoint {
+public protocol Endpoint: Sendable {
     /// The scheme of the endpoint, such as `http` or `https`.
     var scheme: String { get }
-    
+
     /// The host of the endpoint, such as `example.com`.
     var host: String { get }
-    
+
     /// The path of the endpoint, such as `/api/v1/users`.
     var path: String { get }
     
@@ -38,12 +38,12 @@ public extension Endpoint {
     var scheme: String {
         "https"
     }
-    
+
     /// The default host for the endpoint, which is an empty string.
     var host: String {
         ""
     }
-    
+
     /// The default base URL for the endpoint, which is `nil`.
     var baseUrl: String? {
         nil
@@ -56,6 +56,7 @@ public extension Endpoint {
     var header: [String: String]? {
         nil
     }
+
     var body: [String: Any]?  {
         nil
     }

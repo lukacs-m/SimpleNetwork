@@ -58,7 +58,7 @@ final class SimpleNetworkTests: XCTestCase {
  
     // MARK: - Publishers
     
-    func testGetPostsPublisher() {
+    func testGetPostsPublisher() async {
         let expectation = XCTestExpectation(description: "wait for completion")
 
         cancellable = sut.request(endpoint: TestEndpoint.getPosts)
@@ -73,10 +73,10 @@ final class SimpleNetworkTests: XCTestCase {
                 XCTAssertEqual(posts.count, 100)
                 expectation.fulfill()
             }
-        XCTWaiter().wait(for: [expectation], timeout: 5)
+        await fulfillment(of: [expectation])
     }
     
-    func testCreatePostPublisher() {
+    func testCreatePostPublisher() async {
         let expectation = XCTestExpectation(description: "wait for completion")
 
         cancellable = sut.request(endpoint: TestEndpoint.createPost)
@@ -93,10 +93,10 @@ final class SimpleNetworkTests: XCTestCase {
                 XCTAssertEqual(post.userID, 42)
                 expectation.fulfill()
             }
-        XCTWaiter().wait(for: [expectation], timeout: 5)
+        await fulfillment(of: [expectation])
     }
     
-    func testUpdatePostPublisher() {
+    func testUpdatePostPublisher() async {
         let expectation = XCTestExpectation(description: "wait for completion")
 
         cancellable = sut.request(endpoint: TestEndpoint.updatePost)
@@ -113,10 +113,10 @@ final class SimpleNetworkTests: XCTestCase {
                 XCTAssertEqual(post.userID, 45)
                 expectation.fulfill()
             }
-        XCTWaiter().wait(for: [expectation], timeout: 5)
+        await fulfillment(of: [expectation])
     }
 
-    func testPatchPostPublisher() {
+    func testPatchPostPublisher() async {
         let expectation = XCTestExpectation(description: "wait for completion")
 
         cancellable = sut.request(endpoint: TestEndpoint.patchPost)
@@ -131,10 +131,10 @@ final class SimpleNetworkTests: XCTestCase {
                 XCTAssertEqual(post.title, "Title test new")
                 expectation.fulfill()
             }
-        XCTWaiter().wait(for: [expectation], timeout: 5)
+        await fulfillment(of: [expectation])
     }
     
-    func testDeletePostPublisher()  {
+    func testDeletePostPublisher() async {
         let expectation = XCTestExpectation(description: "wait for completion")
 
         cancellable = sut.requestNonDecodable(endpoint: TestEndpoint.deletePost)
@@ -148,10 +148,10 @@ final class SimpleNetworkTests: XCTestCase {
             } receiveValue: { (result: Void) in
                 expectation.fulfill()
             }
-        XCTWaiter().wait(for: [expectation], timeout: 5)
+        await fulfillment(of: [expectation])
     }
     
-    func test_deletePostPublisher_withMismatchReturnTypes_shouldFail() {
+    func test_deletePostPublisher_withMismatchReturnTypes_shouldFail() async {
         let expectation = XCTestExpectation(description: "wait for completion")
 
         cancellable = sut.requestNonDecodable(endpoint: TestEndpoint.deletePost)
@@ -163,10 +163,11 @@ final class SimpleNetworkTests: XCTestCase {
                     XCTAssertTrue(error is SimpleNetwork.RequestErrors)
                     XCTAssertEqual(error as! RequestErrors, SimpleNetwork.RequestErrors.mismatchErrorInReturnType)
                 }
+                expectation.fulfill()
+
             } receiveValue: { (result: Bool) in
                 XCTFail("Should return a missmatch error")
-                expectation.fulfill()
             }
-        XCTWaiter().wait(for: [expectation], timeout: 5)
+        await fulfillment(of: [expectation])
     }
 }

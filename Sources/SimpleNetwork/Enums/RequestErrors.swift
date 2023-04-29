@@ -9,7 +9,7 @@
  The `RequestErrors` enumeration is a Swift enumeration that conforms to the Error protocol.
  It is used to represent errors that can occur when making network requests.
  */
-public enum RequestErrors: Error {
+public enum RequestErrors: Error, Sendable {
     case decode
     case invalidURL
     case noResponse
