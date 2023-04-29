@@ -1,6 +1,6 @@
 //
 //  SimpleClient.swift
-//  
+//
 //
 //  Created by Martin Lukacs on 15/01/2023.
 //
@@ -30,7 +30,7 @@ public protocol SimpleClient: AnyObject, Sendable {
      - Returns: An instance of the specified `Decodable` type, parsed from the response data.
      - Throws: If the request fails or the response cannot be decoded into the specified type.
      */
-    func request<ReturnedType: Decodable>(endpoint: Endpoint) async throws -> ReturnedType
+    func request<ReturnedType: Decodable>(endpoint: any Endpoint) async throws -> ReturnedType
     
     /**
      Sends an HTTP request and returns a publisher that emits an instance of the specified `Decodable` type.
@@ -40,7 +40,7 @@ public protocol SimpleClient: AnyObject, Sendable {
      
      - Returns: A publisher that emits an instance of the specified `Decodable` type, parsed from the response data.
      */
-    func request<ReturnedType: Decodable>(endpoint: Endpoint) -> AnyPublisher<ReturnedType, Error>
+    func request<ReturnedType: Decodable>(endpoint: any Endpoint) -> AnyPublisher<ReturnedType, Error>
     
     /**
      Sends an HTTP request and returns the response data as a non-decodable type.
@@ -51,7 +51,7 @@ public protocol SimpleClient: AnyObject, Sendable {
      - Returns: The response data, returned as an instance of the specified non-decodable type.
      - Throws: If the request fails or the response cannot be parsed into the specified non-decodable type.
      */
-    func requestNonDecadable<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType
+    func requestNonDecodable<ReturnedType>(endpoint: any Endpoint) async throws -> ReturnedType
     
     /**
      Sends an HTTP request and returns a publisher that emits an instance of the specified non-decodable type.
@@ -60,7 +60,7 @@ public protocol SimpleClient: AnyObject, Sendable {
         - endpoint: ``Endpoint``: The endpoint to send the request to.
      - Returns: A publisher that emits an instance of the specified non-decodable type, parsed from the response data.
      */
-    func requestNonDecadable<ReturnedType>(endpoint: Endpoint) -> AnyPublisher<ReturnedType, Error>
+    func requestNonDecodable<ReturnedType>(endpoint: any Endpoint) -> AnyPublisher<ReturnedType, Error>
 }
 
 /**
@@ -76,7 +76,7 @@ public extension SimpleClient {
      - Returns: An instance of the specified `Decodable` type, parsed from the response data.
      - Throws: If the request fails or the response cannot be decoded into the specified type.
      */
-    func request<ReturnedType: Decodable>(endpoint: Endpoint) async throws -> ReturnedType {
+    func request<ReturnedType: Decodable>(endpoint: any Endpoint) async throws -> ReturnedType {
         guard let request = endpoint.request else {
             throw RequestErrors.invalidURL
         }
@@ -108,7 +108,7 @@ public extension SimpleClient {
      
      - Returns: A publisher that emits an instance of the specified `Decodable` type, parsed from the response data.
      */
-    func request<ReturnedType: Decodable>(endpoint: Endpoint) -> AnyPublisher<ReturnedType, Error> {
+    func request<ReturnedType: Decodable>(endpoint: any Endpoint) -> AnyPublisher<ReturnedType, Error> {
         Deferred {
             Future { promise in
                 Task { [weak self] in
@@ -137,7 +137,7 @@ public extension SimpleClient {
      - Returns: The response data, returned as an instance of the specified non-decodable type.
      - Throws: If the request fails or the response cannot be parsed into the specified non-decodable type.
      */
-    func requestNonDecadable<ReturnedType>(endpoint: Endpoint) async throws -> ReturnedType {
+    func requestNonDecodable<ReturnedType>(endpoint: any Endpoint) async throws -> ReturnedType {
         guard let request = endpoint.request else {
             throw RequestErrors.invalidURL
         }
@@ -173,7 +173,7 @@ public extension SimpleClient {
         - endpoint: ``Endpoint`: The endpoint to send the request to.
      - Returns: A publisher that emits an instance of the specified non-decodable type, parsed from the response data.
      */
-    func requestNonDecadable<ReturnedType>(endpoint: Endpoint) -> AnyPublisher<ReturnedType, Error> {
+    func requestNonDecodable<ReturnedType>(endpoint: any Endpoint) -> AnyPublisher<ReturnedType, Error> {
         Deferred {
             Future { promise in
                 Task { [weak self] in
@@ -182,7 +182,7 @@ public extension SimpleClient {
                         return
                     }
                     do {
-                        let result: ReturnedType = try await self.requestNonDecadable(endpoint: endpoint)
+                        let result: ReturnedType = try await self.requestNonDecodable(endpoint: endpoint)
                         promise(.success(result))
                     } catch {
                         promise(.failure(error))
