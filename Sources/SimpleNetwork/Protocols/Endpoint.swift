@@ -17,7 +17,10 @@ public protocol Endpoint: Sendable {
 
     /// The path of the endpoint, such as `/api/v1/users`.
     var path: String { get }
-    
+
+    /// Determines if the endpoint should be authenticated or not
+    var isAuthencated: Bool { get }
+
     /// The base URL of the endpoint, such as `https://example.com`.
     var baseUrl: String? { get }
     
@@ -42,6 +45,10 @@ public extension Endpoint {
     /// The default host for the endpoint, which is an empty string.
     var host: String {
         ""
+    }
+
+    var isAuthencated: Bool {
+        false
     }
 
     /// The default base URL for the endpoint, which is `nil`.
@@ -129,7 +136,7 @@ private extension URL {
         if var urlComponents = URLComponents(url: self, resolvingAgainstBaseURL: false) {
             var queryItems = urlComponents.queryItems ?? [URLQueryItem]()
             params.forEach { param in
-                if let array = param.value as? [CustomStringConvertible] {
+                if let array = param.value as? [any CustomStringConvertible] {
                     array.forEach {
                         queryItems.append(URLQueryItem(name: "\(param.key)[]", value: "\($0)"))
                     }

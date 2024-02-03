@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "simplekeychain",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lukacs-m/SimpleKeychain",
+      "state" : {
+        "revision" : "82afa78dab0e7baa8b005cd80dac982ce0e29e05",
+        "version" : "0.1.1"
+      }
+    }
+  ],
+  "version" : 2
+}
